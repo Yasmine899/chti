@@ -2,24 +2,20 @@
 
 #include "DriverJeuLaser.h"
 
-extern short int LeSignal[];
-extern int DFT_ModuleAuCarre( short int * , char ) ;
-extern int calcul_partie_reel( short int * , char) ;
-extern int calcul_partie_imag( short int * , char) ;
-int partie_reel;
-int partie_imagin;
-
+extern short int LeSignal;
+int DFT_ModuleAuCarre( short int * , char k) ;
 short int dma_buf[64];
 int tabdft[64];
-void fct_debordement(){
+
+void fct_systick_timer(){
 	
 	Start_DMA1(64);
 	Wait_On_End_Of_DMA1();
 	Stop_DMA1;
 
-	for (int i=0;i<63;i++){
-	tabdft[i]=DFT_ModuleAuCarre(LeSignal , i );
-}	
+	for (int i=0;i<=63;i++){
+		tabdft[i]=DFT_ModuleAuCarre(dma_buf , i );
+	}	
 }
 
 int main(void)
@@ -33,9 +29,9 @@ int main(void)
 CLOCK_Configure();
 //partie_reel=calcul_partie_reel(LeSignal,1);
 
-void Systick_Period_ff(360000000);
+Systick_Period_ff(360000000);
 
-void Systick_Prio_IT((0), fct_debordement);
+Systick_Prio_IT(0, fct_systick_timer);
 SysTick_On;
 SysTick_Enable_IT ;
 	
